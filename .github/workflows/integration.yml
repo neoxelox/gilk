@@ -1,0 +1,32 @@
+name: Integration
+
+on:
+  push:
+    tags: [ 'v*.*.*' ]
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@master
+        with:
+          persist-credentials: false
+
+      - name: Setup Go 🐻
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.15.1'
+
+      - name: Lint 🖋️
+        run: make lint
+
+      - name: Test 🧪
+        run: make test
+
+      - name: Publish 🚀
+        run: |
+          export RELEASE_VERSION=${GITHUB_REF#refs/*/}
+          echo ${RELEASE_VERSION}
+          curl "https://sum.golang.org/lookup/github.com/neoxelox/gilk@${RELEASE_VERSION}"
+          curl "https://proxy.golang.org/github.com/neoxelox/gilk/@v/${RELEASE_VERSION}.info"

@@ -1,3 +1,7 @@
+# Own
+notes.md
+tests/
+
 # Binaries for programs and plugins
 *.exe
 *.exe~
