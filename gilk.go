@@ -1,3 +1,4 @@
+// Package gilk implements functions to deal with query profiling.
 package gilk
 
 import (

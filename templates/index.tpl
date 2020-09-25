@@ -12,13 +12,13 @@
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Gilk 🐻">
     <meta name="twitter:description" content="Go per request query profiler 🔎">
-    <meta name="twitter:image" content="https://raw.githubusercontent.com/Neoxelox/shortr/master/static/images/banner.png">
+    <meta name="twitter:image" content="https://raw.githubusercontent.com/Neoxelox/gilk/master/static/images/banner.png">
     <!-- Open Graph -->
     <meta property="og:type" content="summary">
     <meta property="og:site_name" content="Gilk">
     <meta property="og:title" content="Gilk 🐻">
     <meta property="og:description" content="Go per request query profiler 🔎">
-    <meta property="og:image" content="https://raw.githubusercontent.com/Neoxelox/shortr/master/static/images/banner.png">
+    <meta property="og:image" content="https://raw.githubusercontent.com/Neoxelox/gilk/master/static/images/banner.png">
     <link rel="stylesheet" href="/static/styles/tomorrow.css">
     <script src="/static/scripts/highlight.pack.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
