@@ -51,7 +51,12 @@ var (
 type contextKeyType string
 
 const (
-	contextKey contextKeyType = "GilkContextKey"
+	contextKey     contextKeyType = "GilkContextKey"
+	lightgreyColor string         = "light"
+	greenColor     string         = "success"
+	blueColor      string         = "info"
+	yellowColor    string         = "warning"
+	redColor       string         = "danger"
 )
 
 var (
@@ -78,11 +83,11 @@ func (q *query) Color() string {
 
 	switch {
 	case elapsed <= (100 * time.Millisecond):
-		return "success"
+		return greenColor
 	case elapsed <= (250 * time.Millisecond):
-		return "warning"
+		return yellowColor
 	default:
-		return "danger"
+		return redColor
 	}
 }
 
@@ -128,15 +133,15 @@ func (c *context) HasFinished() bool {
 func (c *context) MethodColor() string {
 	switch c.Method {
 	case http.MethodGet:
-		return "success"
+		return greenColor
 	case http.MethodPost:
-		return "info"
+		return blueColor
 	case http.MethodPut, http.MethodPatch:
-		return "warning"
+		return yellowColor
 	case http.MethodDelete:
-		return "danger"
+		return redColor
 	default:
-		return "light"
+		return lightgreyColor
 	}
 }
 
@@ -145,11 +150,11 @@ func (c *context) ContextColor() string {
 
 	switch {
 	case elapsed <= (250 * time.Millisecond):
-		return "success"
+		return greenColor
 	case elapsed <= (500 * time.Millisecond):
-		return "warning"
+		return yellowColor
 	default:
-		return "danger"
+		return redColor
 	}
 }
 
@@ -162,11 +167,11 @@ func (c *context) QueriesColor() string {
 
 	switch {
 	case elapsed <= (100 * time.Millisecond):
-		return "success"
+		return greenColor
 	case elapsed <= (250 * time.Millisecond):
-		return "warning"
+		return yellowColor
 	default:
-		return "danger"
+		return redColor
 	}
 }
 
@@ -175,11 +180,11 @@ func (c *context) LenQueriesColor() string {
 
 	switch {
 	case queries <= 10:
-		return "success"
+		return greenColor
 	case queries <= 15:
-		return "warning"
+		return yellowColor
 	default:
-		return "danger"
+		return redColor
 	}
 }
 
@@ -268,7 +273,10 @@ func getRendered(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	templates.ExecuteTemplate(w, "index.tpl", response)
+	err := templates.ExecuteTemplate(w, "index.tpl", response)
+	if err != nil {
+		fmt.Printf("Gilk cannot serve template: %s", err)
+	}
 }
 
 // Serve serves an HTML page with cache's Contexts
@@ -294,7 +302,10 @@ func getRaw(w http.ResponseWriter, r *http.Request) {
 	serializedResponse, _ := json.MarshalIndent(response, "", "  ")
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Write(serializedResponse)
+	_, err := w.Write(serializedResponse)
+	if err != nil {
+		fmt.Printf("Gilk cannot serve raw: %s", err)
+	}
 }
 
 // ServeRaw serves a plain JSON page with cache's Contexts

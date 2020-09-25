@@ -18,11 +18,11 @@ jobs:
         with:
           go-version: '1.15.1'
 
-      - name: Lint 🖋️
-        run: make lint
+      # - name: Lint 🖋️
+      #   run: make lint
 
-      - name: Test 🧪
-        run: make test
+      # - name: Test 🧪
+      #   run: make test
 
       - name: Publish 🚀
         run: |
