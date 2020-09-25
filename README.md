@@ -13,6 +13,7 @@ Gilk is a simple, per request, query profiler inspired by [Django's Silk](https:
 
 ## Usage
 The example is done with the standard `net/http` package.
+
 You should be able to extrapolate the following example to any golang web framework.
 
 ```go
@@ -56,6 +57,7 @@ func (db *Database) MyQuery(ctx context.Context, query string, args ...interface
 **_Note!_** defer calls of `NewContext` should be the first thing of you handler and `NewQuery` should be as close as possible to the real database query, in order to improve the statistics.
 
 Look for more examples [`here`](examples).
+
 See [`GoDev`](https://pkg.go.dev/github.com/neoxelox/gilk) for further documentation.
 
 ## Configuration
