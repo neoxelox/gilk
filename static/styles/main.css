@@ -1,0 +1,115 @@
+.tabs li.is-active a {
+  border-bottom-color: #00d1b2;
+  color: #00d1b2;
+}
+
+div.card-content.queries {
+  padding: 0.25em 0px;
+}
+
+div.snippet {
+  overflow: auto;
+  max-height: 250px;
+  border-radius: 6px;
+}
+
+div.snippet pre {
+  padding: 0px;
+}
+
+div.snippet code.sql.hljs {
+  padding: 1.5em;
+  background: #f5f5f5;
+  font-weight: bold;
+  white-space: pre-line;
+}
+
+div.accordion {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+div.accordion .accordion-tab {
+  width: 100%;
+  color: #363636;
+  overflow: hidden;
+  border-bottom: 1px solid #e9e9e9;
+}
+
+div.accordion .accordion-tab:last-child {
+  border-bottom: none;
+}
+
+div.accordion .accordion-tab input {
+  position: absolute;
+  opacity: 0;
+  z-index: -1;
+}
+
+div.accordion .accordion-tab input:checked + .accordion-tab-label {
+  background: #f2f2f2;
+}
+
+div.accordion .accordion-tab input:checked + .accordion-tab-label::after {
+  -webkit-transform: rotate(90deg) translateX(0.25em);
+          transform: rotate(90deg) translateX(0.25em);
+}
+
+div.accordion .accordion-tab input:checked ~ .accordion-tab-content {
+  max-height: 100vh;
+  padding: 1em;
+}
+
+div.accordion .accordion-tab-label {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  padding: 1em;
+  background: #ffffff;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+div.accordion .accordion-tab-label:hover {
+  background: #f2f2f2;
+}
+
+div.accordion .accordion-tab-label::after {
+  content: "\276F";
+  width: 1em;
+  height: 1em;
+  text-align: center;
+  -webkit-transition: all .35s;
+  transition: all .35s;
+}
+
+div.accordion .accordion-tab-content {
+  max-height: 0;
+  padding: 0 1em;
+  color: #363636;
+  background: #ffffff;
+  -webkit-transition: all .35s;
+  transition: all .35s;
+}
+
+div.accordion .accordion-tab-close {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+  padding: 1em;
+  font-size: 0.75em;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+div.accordion .accordion-tab-close:hover {
+  background: #e6e6e6;
+}
+/*# sourceMappingURL=main.css.map */

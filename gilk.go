@@ -3,9 +3,13 @@ package gilk
 import (
 	gocontext "context"
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"net/http"
+	"regexp"
 	"runtime"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/neoxelox/gilk/deque"
@@ -51,7 +55,11 @@ const (
 )
 
 var (
-	templates *template.Template = template.Must(template.ParseGlob("./templates/*.tpl"))
+	templates        *template.Template = template.Must(template.ParseGlob("./templates/*.tpl"))
+	decimalTrim                         = regexp.MustCompile(`\.[0-9]*`)
+	firstLineTrim                       = regexp.MustCompile(`^\s`)
+	postgresReplacer                    = regexp.MustCompile(`\$[1-9]+`)
+	mySQLReplacer                       = regexp.MustCompile(`\?`)
 )
 
 // Query describes a query context
@@ -65,26 +73,146 @@ type query struct {
 	EndTime    time.Time     `json:"end_time"`
 }
 
+func (q *query) Color() string {
+	elapsed := q.EndTime.Sub(q.StartTime)
+
+	switch {
+	case elapsed <= (100 * time.Millisecond):
+		return "success"
+	case elapsed <= (250 * time.Millisecond):
+		return "warning"
+	default:
+		return "danger"
+	}
+}
+
+func (q *query) Duration() string {
+	return decimalTrim.ReplaceAllString(q.EndTime.Sub(q.StartTime).String(), "")
+}
+
+func (q *query) Format() string {
+	sql := q.Query
+	sql = firstLineTrim.ReplaceAllString(sql, "")
+
+	switch {
+	case postgresReplacer.MatchString(sql):
+		for index, arg := range q.Args {
+			sarg := fmt.Sprintf("%v", arg)
+			sql = strings.Replace(sql, "$"+strconv.Itoa(index+1), sarg, 1)
+		}
+		return sql
+	case mySQLReplacer.MatchString(sql):
+		for _, arg := range q.Args {
+			sarg := fmt.Sprintf("%v", arg)
+			sql = strings.Replace(sql, "?", sarg, 1)
+		}
+		return sql
+	default:
+		return sql
+	}
+}
+
 // Context describes an scoped context
 type context struct {
 	Path      string    `json:"path"`
+	Method    string    `json:"method"`
 	Queries   []query   `json:"queries"`
 	StartTime time.Time `json:"start_time"`
 	EndTime   time.Time `json:"end_time"`
 }
 
+func (c *context) HasFinished() bool {
+	return c.EndTime.After(c.StartTime)
+}
+
+func (c *context) MethodColor() string {
+	switch c.Method {
+	case http.MethodGet:
+		return "success"
+	case http.MethodPost:
+		return "info"
+	case http.MethodPut, http.MethodPatch:
+		return "warning"
+	case http.MethodDelete:
+		return "danger"
+	default:
+		return "light"
+	}
+}
+
+func (c *context) ContextColor() string {
+	elapsed := c.EndTime.Sub(c.StartTime)
+
+	switch {
+	case elapsed <= (250 * time.Millisecond):
+		return "success"
+	case elapsed <= (500 * time.Millisecond):
+		return "warning"
+	default:
+		return "danger"
+	}
+}
+
+func (c *context) QueriesColor() string {
+	elapsed := 0 * time.Millisecond
+
+	for _, q := range c.Queries {
+		elapsed += q.EndTime.Sub(q.StartTime)
+	}
+
+	switch {
+	case elapsed <= (100 * time.Millisecond):
+		return "success"
+	case elapsed <= (250 * time.Millisecond):
+		return "warning"
+	default:
+		return "danger"
+	}
+}
+
+func (c *context) LenQueriesColor() string {
+	queries := len(c.Queries)
+
+	switch {
+	case queries <= 10:
+		return "success"
+	case queries <= 15:
+		return "warning"
+	default:
+		return "danger"
+	}
+}
+
+func (c *context) ContextDuration() string {
+	return decimalTrim.ReplaceAllString(c.EndTime.Sub(c.StartTime).String(), "")
+}
+
+func (c *context) QueriesDuration() string {
+	elapsed := 0 * time.Millisecond
+
+	for _, q := range c.Queries {
+		elapsed += q.EndTime.Sub(q.StartTime)
+	}
+
+	return decimalTrim.ReplaceAllString(elapsed.String(), "")
+}
+
 // NewContext creates and caches a new Context of the executed scope
-func NewContext(parent *gocontext.Context, path string) func() {
+func NewContext(parent *gocontext.Context, path string, method string) func() {
 	if Mode != Enabled || parent == nil {
 		return func() {}
 	}
 
 	gilkContext := &context{
 		Path:      path,
+		Method:    method,
 		StartTime: time.Now(),
 	}
 
-	cache.Prepend(gilkContext)
+	if ok := cache.Prepend(gilkContext); !ok {
+		cache.Pop()
+		cache.Prepend(gilkContext)
+	}
 
 	*parent = gocontext.WithValue(*parent, contextKey, gilkContext)
 

@@ -1,0 +1,113 @@
+$bulma-white-background-color: #ffffff;
+$bulma-light-background-color: #f5f5f5;
+$bulma-black-text-color: #363636;
+$bulma-primary-color: #00d1b2;
+
+// Bulma overrides
+.tabs li.is-active a {
+    border-bottom-color: $bulma-primary-color;
+    color: $bulma-primary-color;
+}
+
+div.card-content.queries {
+    padding: 0.25em 0px;
+}
+
+// Snippet
+div.snippet {
+    overflow: auto;
+    max-height: 250px;
+    border-radius: 6px;
+
+    pre {
+        padding: 0px;
+    }
+
+    code.sql.hljs {
+        padding: 1.5em;
+        background: $bulma-light-background-color;
+        font-weight: bold;
+        white-space: pre-line;
+    }
+}
+
+// Accordion
+div.accordion {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+
+    .accordion-tab {
+        width: 100%;
+        color: $bulma-black-text-color;
+        overflow: hidden;
+        border-bottom: 1px solid lighten($bulma-black-text-color, 70%);
+        &:last-child {
+            border-bottom: none;
+        }
+        
+
+        input {
+            position: absolute;
+            opacity: 0;
+            z-index: -1;
+    
+            &:checked {
+                + .accordion-tab-label {
+                    background: darken($bulma-white-background-color, 5%);
+                    
+                    &::after {
+                        transform: rotate(90deg) translateX(0.25em);
+                    }
+                }
+    
+                ~ .accordion-tab-content {
+                    max-height: 100vh;
+                    padding: 1em;
+                }
+            }
+        }
+
+        &-label {
+            display: flex;
+            justify-content: space-between;
+            padding: 1em;
+            background: $bulma-white-background-color;
+            font-weight: bold;
+            cursor: pointer;
+
+            &:hover {
+                background: darken($bulma-white-background-color, 5%);
+            }
+
+            &::after {
+                content: "\276F";
+                width: 1em;
+                height: 1em;
+                text-align: center;
+                transition: all .35s;
+            }
+        }
+
+        &-content {
+            max-height: 0;
+            padding: 0 1em;
+            color: $bulma-black-text-color;
+            background: $bulma-white-background-color;
+            transition: all .35s;
+        }
+
+        &-close {
+            display: flex;
+            justify-content: flex-end;
+            padding: 1em;
+            font-size: 0.75em;
+            background: $bulma-white-background-color;
+            cursor: pointer;
+
+            &:hover {
+                background: darken($bulma-white-background-color, 10%);
+            }
+        }
+    }
+}
