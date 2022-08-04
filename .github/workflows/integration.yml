@@ -14,9 +14,10 @@ jobs:
           persist-credentials: false
 
       - name: Setup Go 🐻
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: "1.19"
+          cache: true
 
       # - name: Lint 🖋️
       #   run: make lint
@@ -32,4 +33,4 @@ jobs:
           echo ${RELEASE_VERSION}
           curl "https://sum.golang.org/lookup/github.com/neoxelox/gilk@${RELEASE_VERSION}"
           curl "https://proxy.golang.org/github.com/neoxelox/gilk/@v/${RELEASE_VERSION}.info"
-          go get github.com/neoxelox/kit@${RELEASE_VERSION}
+          go get github.com/neoxelox/gilk@${RELEASE_VERSION}
