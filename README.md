@@ -30,8 +30,10 @@ func main() {
 }
 
 func someHandler(w http.ResponseWriter, r *http.Request) {
-    ctx := context.Background()
-    defer gilk.NewContext(&ctx, r.URL.Path, r.Method)()
+    ctx, endContext := gilk.NewContext(r.Context(), r.URL.Path, r.Method)
+	defer endContext()
+
+	r = r.WithContext(ctx)
     // ...
     repo.SomeQuery(ctx, something)
     // ...
@@ -48,7 +50,9 @@ func (r *repo) SomeQuery(ctx context.Context, something string) {
 }
 
 func (db *Database) MyQuery(ctx context.Context, query string, args ...interface{}) {
-    defer gilk.NewQuery(ctx, query, args...)()
+    ctx, endQuery := gilk.NewQuery(ctx, query, args...)
+	defer endQuery()
+
     db.Query(query, args...)
     // ...
 }

@@ -43,7 +43,7 @@
                     </a>
                     <div class="tags has-addons">
                         <span class="tag">Version</span>
-                        <span class="tag is-primary is-light">0.1.0</span>
+                        <span class="tag is-primary is-light">0.2.0</span>
                     </div>
                 </div>
             </div>
@@ -99,7 +99,7 @@
                 <div class="tabs has-text-primary">
                     <ul>
                       <li :class="{ 'is-active': tab === 'overall' }" @click="tab = 'overall'"><a>Overall</a></li>
-                      <li :class="{ 'is-active': tab === 'queries' }" @click="tab = 'queries'"><a>Queries</a></li>
+                      <li x-show="{{len $context.Queries}}" :class="{ 'is-active': tab === 'queries' }" @click="tab = 'queries'"><a>Queries</a></li>
                     </ul>
                   </div>
             </footer>

@@ -18,8 +18,10 @@ func main() {
 }
 
 func getUsers(w http.ResponseWriter, r *http.Request) {
-	ctx := context.Background()
-	defer gilk.NewContext(&ctx, r.URL.Path, r.Method)()
+	ctx, endContext := gilk.NewContext(r.Context(), r.URL.Path, r.Method)
+	defer endContext()
+
+	r = r.WithContext(ctx)
 
 	time.Sleep(200 * time.Millisecond)
 
@@ -32,7 +34,10 @@ func getUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func queryWithContext(ctx context.Context, query string, args ...interface{}) string {
-	defer gilk.NewQuery(ctx, query, args...)()
+	ctx, endQuery := gilk.NewQuery(ctx, query, args...)
+	defer endQuery()
+
 	time.Sleep(150 * time.Millisecond)
+
 	return "query executed"
 }

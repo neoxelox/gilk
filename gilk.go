@@ -3,9 +3,11 @@ package gilk
 
 import (
 	gocontext "context"
+	"embed"
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"io/fs"
 	"net/http"
 	"regexp"
 	"runtime"
@@ -61,7 +63,11 @@ const (
 )
 
 var (
-	templates        *template.Template = template.Must(template.ParseGlob("./templates/*.tpl"))
+	//go:embed static
+	staticFS embed.FS
+	//go:embed templates
+	templatesFS      embed.FS
+	templates        *template.Template = template.Must(template.ParseFS(templatesFS, "templates/*.tpl"))
 	decimalTrim                         = regexp.MustCompile(`\.[0-9]*`)
 	firstLineTrim                       = regexp.MustCompile(`^\s`)
 	postgresReplacer                    = regexp.MustCompile(`\$[1-9]+`)
@@ -204,9 +210,9 @@ func (c *context) QueriesDuration() string {
 }
 
 // NewContext creates and caches a new Context of the executed scope
-func NewContext(parent *gocontext.Context, path string, method string) func() {
-	if Mode != Enabled || parent == nil {
-		return func() {}
+func NewContext(ctx gocontext.Context, path string, method string) (gocontext.Context, func()) {
+	if Mode != Enabled || ctx == nil {
+		return ctx, func() {}
 	}
 
 	gilkContext := &context{
@@ -220,17 +226,17 @@ func NewContext(parent *gocontext.Context, path string, method string) func() {
 		cache.Prepend(gilkContext)
 	}
 
-	*parent = gocontext.WithValue(*parent, contextKey, gilkContext)
+	ctx = gocontext.WithValue(ctx, contextKey, gilkContext)
 
-	return func() {
+	return ctx, func() {
 		gilkContext.EndTime = time.Now()
 	}
 }
 
 // NewQuery creates and caches a new Query to the Context of the executed scope
-func NewQuery(ctx gocontext.Context, sql string, args ...interface{}) func() {
+func NewQuery(ctx gocontext.Context, sql string, args ...interface{}) (gocontext.Context, func()) {
 	if Mode != Enabled {
-		return func() {}
+		return ctx, func() {}
 	}
 
 	file := ""
@@ -252,7 +258,7 @@ func NewQuery(ctx gocontext.Context, sql string, args ...interface{}) func() {
 		StartTime:  time.Now(),
 	}
 
-	return func() {
+	return ctx, func() {
 		gilkQuery.EndTime = time.Now()
 
 		gilkContext, ok := ctx.Value(contextKey).(*context)
@@ -286,7 +292,10 @@ func Serve(addr string) error {
 		return nil
 	}
 
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+	static := fs.FS(staticFS)
+	static, _ = fs.Sub(static, "static")
+
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(static))))
 	http.HandleFunc("/", getRendered)
 	return http.ListenAndServe(addr, nil)
 }

@@ -2,7 +2,7 @@ name: Integration
 
 on:
   push:
-    tags: [ 'v*.*.*' ]
+    tags: ["v*.*.*"]
 
 jobs:
   integration:
@@ -16,7 +16,7 @@ jobs:
       - name: Setup Go 🐻
         uses: actions/setup-go@v2
         with:
-          go-version: '1.15.1'
+          go-version: "1.19"
 
       # - name: Lint 🖋️
       #   run: make lint
@@ -27,6 +27,9 @@ jobs:
       - name: Publish 🚀
         run: |
           export RELEASE_VERSION=${GITHUB_REF#refs/*/}
+          export GO111MODULE=on
+          export GOPROXY=https://proxy.golang.org
           echo ${RELEASE_VERSION}
           curl "https://sum.golang.org/lookup/github.com/neoxelox/gilk@${RELEASE_VERSION}"
           curl "https://proxy.golang.org/github.com/neoxelox/gilk/@v/${RELEASE_VERSION}.info"
+          go get github.com/neoxelox/kit@${RELEASE_VERSION}
