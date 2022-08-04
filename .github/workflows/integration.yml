@@ -27,6 +27,8 @@ jobs:
 
       - name: Publish 🚀
         run: |
+          mkdir publish
+          go mod init publish
           export RELEASE_VERSION=${GITHUB_REF#refs/*/}
           export GO111MODULE=on
           export GOPROXY=https://proxy.golang.org
