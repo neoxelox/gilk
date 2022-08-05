@@ -84,26 +84,33 @@ def publish(context):
     if Envs.Current != Envs.Prod:
         context.fail(f"publish command only available in {Envs.Prod} environment!")
 
-    version = context.tag()
-    if not version:
-        latest_version = context.tag(current=False) or "v0.0.0"
-        major, minor, patch = tuple(map(str, (latest_version.split("."))))
-        version = f"{major}.{str(int(minor) + 1)}.{0}"
-        context.info(f"Version tag not set, generating one from {latest_version}: {version}")
-        context.run(f"{Tools.Git} tag {version}")
-        context.run(f"{Tools.Git} push --follow-tags")
-    else:
-        context.info(f"Version tag already set: {version}")
+    print(context.tag())
+    print(context.tag() is None)
+    print(context.tag() == "")
+    print(context.tag(current=False))
+    print(context.tag(current=False) is None)
+    print(context.tag(current=False) == "")
 
-    context.info("Refreshing golang module registry cache")
+    # version = context.tag()
+    # if not version:
+    #     latest_version = context.tag(current=False) or "v0.0.0"
+    #     major, minor, patch = tuple(map(str, (latest_version.split("."))))
+    #     version = f"{major}.{str(int(minor) + 1)}.{0}"
+    #     context.info(f"Version tag not set, generating one from {latest_version}: {version}")
+    #     context.run(f"{Tools.Git} tag {version}")
+    #     context.run(f"{Tools.Git} push --follow-tags")
+    # else:
+    #     context.info(f"Version tag already set: {version}")
 
-    context.create("publish", dir=True)
+    # context.info("Refreshing golang module registry cache")
 
-    with context.cd("publish"):
-        context.run(f"{Tools.Curl} 'https://sum.golang.org/lookup/github.com/neoxelox/gilk@{version}'")
-        context.run(f"{Tools.Curl} 'https://proxy.golang.org/github.com/neoxelox/gilk/@v/{version}.info'")
-        context.run(f"{Tools.Go} mod init publish")
-        context.run(
-            f"{Tools.Go} get github.com/neoxelox/gilk@{version}",
-            env={"GOPROXY": "https://proxy.golang.org", "GO111MODULE": "on"},
-        )
+    # context.create("publish", dir=True)
+
+    # with context.cd("publish"):
+    #     context.run(f"{Tools.Curl} 'https://sum.golang.org/lookup/github.com/neoxelox/gilk@{version}'")
+    #     context.run(f"{Tools.Curl} 'https://proxy.golang.org/github.com/neoxelox/gilk/@v/{version}.info'")
+    #     context.run(f"{Tools.Go} mod init publish")
+    #     context.run(
+    #         f"{Tools.Go} get github.com/neoxelox/gilk@{version}",
+    #         env={"GOPROXY": "https://proxy.golang.org", "GO111MODULE": "on"},
+    #     )
