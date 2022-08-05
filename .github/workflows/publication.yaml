@@ -2,7 +2,7 @@ name: Publication
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   publication:
@@ -14,14 +14,14 @@ jobs:
       - name: Setup Python 🐍
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
-          cache: 'pip'
+          python-version: "3.10"
+          cache: "pip"
 
       - name: Setup Scripts 🧩
         run: |
           pip install -r scripts/requirements.txt
           inv env.switch prod
-          inv tool.install prod
+          inv tool.install prod --yes
 
       - name: Publish 🚀
         run: inv publish
