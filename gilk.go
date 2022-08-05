@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"html/template"
 	"io/fs"
+	"log"
 	"net/http"
 	"regexp"
 	"runtime"
@@ -51,6 +52,40 @@ var (
 	SkippedStackFrames = 1
 )
 
+var (
+	// QueryGreenColorLatency defines the green color maximum
+	// latency threshold for a single query
+	QueryGreenColorLatency = 100 * time.Millisecond
+
+	// QueryYellowColorLatency defines the yellow color maximum
+	// latency threshold for a single query
+	QueryYellowColorLatency = 250 * time.Millisecond
+
+	// ContextGreenColorLatency defines the green color maximum
+	// latency threshold for a single context
+	ContextGreenColorLatency = 250 * time.Millisecond
+
+	// ContextYellowColorLatency defines the yellow color maximum
+	// latency threshold for a single context
+	ContextYellowColorLatency = 500 * time.Millisecond
+
+	// QueriesGreenColorLatency defines the green color maximum
+	// latency threshold for all the queries within a context
+	QueriesGreenColorLatency = 100 * time.Millisecond
+
+	// QueriesYellowColorLatency defines the yellow color maximum
+	// latency threshold for all the queries within a context
+	QueriesYellowColorLatency = 250 * time.Millisecond
+
+	// QueriesGreenColorNumber defines the green color maximum
+	// number threshold for queries within a context
+	QueriesGreenColorNumber = 10
+
+	// QueriesYellowColorNumber defines the yellow color maximum
+	// number threshold for queries within a context
+	QueriesYellowColorNumber = 15
+)
+
 type contextKeyType string
 
 const (
@@ -89,9 +124,9 @@ func (q *query) Color() string {
 	elapsed := q.EndTime.Sub(q.StartTime)
 
 	switch {
-	case elapsed <= (100 * time.Millisecond):
+	case elapsed <= QueryGreenColorLatency:
 		return greenColor
-	case elapsed <= (250 * time.Millisecond):
+	case elapsed <= QueryYellowColorLatency:
 		return yellowColor
 	default:
 		return redColor
@@ -112,12 +147,14 @@ func (q *query) Format() string {
 			sarg := fmt.Sprintf("%v", arg)
 			sql = strings.Replace(sql, "$"+strconv.Itoa(index+1), sarg, 1)
 		}
+
 		return sql
 	case mySQLReplacer.MatchString(sql):
 		for _, arg := range q.Args {
 			sarg := fmt.Sprintf("%v", arg)
 			sql = strings.Replace(sql, "?", sarg, 1)
 		}
+
 		return sql
 	default:
 		return sql
@@ -156,9 +193,9 @@ func (c *context) ContextColor() string {
 	elapsed := c.EndTime.Sub(c.StartTime)
 
 	switch {
-	case elapsed <= (250 * time.Millisecond):
+	case elapsed <= ContextGreenColorLatency:
 		return greenColor
-	case elapsed <= (500 * time.Millisecond):
+	case elapsed <= ContextYellowColorLatency:
 		return yellowColor
 	default:
 		return redColor
@@ -173,9 +210,9 @@ func (c *context) QueriesColor() string {
 	}
 
 	switch {
-	case elapsed <= (100 * time.Millisecond):
+	case elapsed <= QueriesGreenColorLatency:
 		return greenColor
-	case elapsed <= (250 * time.Millisecond):
+	case elapsed <= QueriesYellowColorLatency:
 		return yellowColor
 	default:
 		return redColor
@@ -186,9 +223,9 @@ func (c *context) LenQueriesColor() string {
 	queries := len(c.Queries)
 
 	switch {
-	case queries <= 10:
+	case queries <= QueriesGreenColorNumber:
 		return greenColor
-	case queries <= 15:
+	case queries <= QueriesYellowColorNumber:
 		return yellowColor
 	default:
 		return redColor
@@ -270,7 +307,7 @@ func NewQuery(ctx gocontext.Context, sql string, args ...interface{}) (gocontext
 	}
 }
 
-func getRendered(w http.ResponseWriter, r *http.Request) {
+func getRendered(w http.ResponseWriter, r *http.Request) { // nolint
 	var response []*context
 
 	for iter := cache.IterFirst(); iter != nil; iter = iter.Next() {
@@ -280,9 +317,10 @@ func getRendered(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
 	err := templates.ExecuteTemplate(w, "index.tpl", response)
 	if err != nil {
-		fmt.Printf("Gilk cannot serve template: %s", err)
+		log.Printf("Gilk cannot serve template: %s\n", err)
 	}
 }
 
@@ -293,14 +331,19 @@ func Serve(addr string) error {
 	}
 
 	static := fs.FS(staticFS)
-	static, _ = fs.Sub(static, "static")
+
+	static, err := fs.Sub(static, "static")
+	if err != nil {
+		panic(err)
+	}
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(static))))
 	http.HandleFunc("/", getRendered)
-	return http.ListenAndServe(addr, nil)
+
+	return http.ListenAndServe(addr, nil) // nolint
 }
 
-func getRaw(w http.ResponseWriter, r *http.Request) {
+func getRaw(w http.ResponseWriter, r *http.Request) { // nolint
 	var response []*context
 
 	for iter := cache.IterFirst(); iter != nil; iter = iter.Next() {
@@ -309,12 +352,17 @@ func getRaw(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	serializedResponse, _ := json.MarshalIndent(response, "", "  ")
+	serializedResponse, err := json.MarshalIndent(response, "", "  ")
+	if err != nil {
+		log.Printf("Gilk cannot serve raw: %s\n", err)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	_, err := w.Write(serializedResponse)
+
+	_, err = w.Write(serializedResponse)
 	if err != nil {
-		fmt.Printf("Gilk cannot serve raw: %s", err)
+		log.Printf("Gilk cannot serve raw: %s\n", err)
 	}
 }
 
@@ -325,5 +373,6 @@ func ServeRaw(addr string) error {
 	}
 
 	http.HandleFunc("/", getRaw)
-	return http.ListenAndServe(addr, nil)
+
+	return http.ListenAndServe(addr, nil) // nolint
 }
