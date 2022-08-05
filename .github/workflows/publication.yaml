@@ -17,11 +17,18 @@ jobs:
           python-version: "3.10"
           cache: "pip"
 
-      - name: Setup Scripts 🧩
+      - name: Test
         run: |
-          pip install -r scripts/requirements.txt
-          inv env.switch prod
-          inv tool.install prod --yes
+          git name-rev --name-only --tags HEAD
+          echo ====================
+          git describe --tags --abbrev=0
 
-      - name: Publish 🚀
-        run: inv publish
+
+      # - name: Setup Scripts 🧩
+      #   run: |
+      #     pip install -r scripts/requirements.txt
+      #     inv env.switch prod
+      #     inv tool.install prod --yes
+
+      # - name: Publish 🚀
+      #   run: inv publish
