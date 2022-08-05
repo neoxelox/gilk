@@ -112,6 +112,7 @@ func (s *Deque) First() interface{} {
 	if item != nil {
 		return item.Value
 	}
+
 	return nil
 }
 
@@ -124,6 +125,7 @@ func (s *Deque) Last() interface{} {
 	if item != nil {
 		return item.Value
 	}
+
 	return nil
 }
 
@@ -139,6 +141,7 @@ func (s *Deque) Size() int {
 func (s *Deque) Capacity() int {
 	s.RLock()
 	defer s.RUnlock()
+
 	return s.capacity
 }
 

@@ -69,6 +69,14 @@ There are a few things you can configurate to improve your experience:
 - **`gilk.Mode`** : set to `gilk.Disabled` to disable caching contexts, queries and serving them. Set to `gilk.Enabled` to enable. Default: `gilk.Enabled`.
 - **`gilk.SkippedStackFrames`** : number of stack frames to be skipped when the caller of the query context is captured. Default: `1`.
 - **`gilk.CacheCapacity`** : capacity of the context cache, `gilk.Reset()` needs to be called afterwards in order to make the change. Default: `50`.
+- **`gilk.QueryGreenColorLatency`** : green color maximum latency threshold for a single query. Default: `100 * time.Millisecond`.
+- **`gilk.QueryYellowColorLatency`** : yellow color maximum latency threshold for a single query. Default: `250 * time.Millisecond`.
+- **`gilk.ContextGreenColorLatency`** : green color maximum latency threshold for a single context. Default: `250 * time.Millisecond`.
+- **`gilk.ContextYellowColorLatency`** : yellow color maximum latency threshold for a single context. Default: `500 * time.Millisecond`.
+- **`gilk.QueriesGreenColorLatency`** : green color maximum latency threshold for all the queries within a context. Default: `100 * time.Millisecond`.
+- **`gilk.QueriesYellowColorLatency`** : yellow color maximum latency threshold for all the queries within a context. Default: `250 * time.Millisecond`.
+- **`gilk.QueriesGreenColorNumber`** : green color maximum number threshold for queries within a context. Default: `10`.
+- **`gilk.QueriesYellowColorNumber`** : yellow color maximum number threshold for queries within a context. Default: `15`.
 
 ## Serving UI
 The most convenient way to work with Gilk is to use `gilk.Serve(port)` that launches a UI in the assigned port. However you can also serve the raw JSON data `gilk.ServeRaw(port)`.
