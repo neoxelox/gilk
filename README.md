@@ -1,4 +1,4 @@
-# gilk ![Integration](https://github.com/Neoxelox/gilk/workflows/Integration/badge.svg)
+# gilk ![Integration](https://github.com/Neoxelox/gilk/workflows/Integration/badge.svg) ![Publication](https://github.com/Neoxelox/gilk/workflows/Publication/badge.svg)
 **`silk-like query profiler for golang` 🐻**
 
 ![Banner](./static/images/banner.png "Banner")
