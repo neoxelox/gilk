@@ -43,7 +43,7 @@
                     </a>
                     <div class="tags has-addons">
                         <span class="tag">Version</span>
-                        <span class="tag is-primary is-light">0.2.4</span>
+                        <span class="tag is-primary is-light">0.4.0</span>
                     </div>
                 </div>
             </div>

@@ -97,12 +97,5 @@ def publish(context):
 
     context.info("Refreshing golang module registry cache")
 
-    context.create("publish", dir=True)
-    with context.cd("publish"):
-        context.run(f"{Tools.Curl} 'https://sum.golang.org/lookup/github.com/neoxelox/gilk@{version}'")
-        context.run(f"{Tools.Curl} 'https://proxy.golang.org/github.com/neoxelox/gilk/@v/{version}.info'")
-        context.run(f"{Tools.Go} mod init publish")
-        context.run(
-            f"{Tools.Go} get github.com/neoxelox/gilk@{version}",
-            env={"GOPROXY": "https://proxy.golang.org", "GO111MODULE": "on"},
-        )
+    context.run(f"{Tools.Curl} 'https://sum.golang.org/lookup/github.com/neoxelox/gilk@{version}'")
+    context.run(f"{Tools.Curl} 'https://proxy.golang.org/github.com/neoxelox/gilk/@v/{version}.info'")
