@@ -91,7 +91,7 @@ def publish(context):
         version = f"{major}.{str(int(minor) + 1)}.{0}"
         context.info(f"Version tag not set, generating one from {latest_version}: {version}")
         context.run(f"{Tools.Git} tag {version}")
-        context.run(f"{Tools.Git} push --follow-tags")
+        context.run(f"{Tools.Git} push origin {version}")
     else:
         context.info(f"Version tag already set: {version}")
 
