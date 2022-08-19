@@ -27,7 +27,7 @@ jobs:
         run: |
           pip install -r scripts/requirements.txt
           inv env.switch ci
-          inv tool.install ci --yes
+          inv tool.install ci-int --yes
 
       - name: Lint 🪶
         run: inv lint

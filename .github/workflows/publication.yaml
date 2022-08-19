@@ -22,8 +22,8 @@ jobs:
       - name: Setup Scripts 🧩
         run: |
           pip install -r scripts/requirements.txt
-          inv env.switch prod
-          inv tool.install prod --yes
+          inv env.switch ci
+          inv tool.install ci-pub --yes
 
       - name: Publish 🚀
         run: inv publish
