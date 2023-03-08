@@ -1,4 +1,4 @@
-# gilk ![Integration](https://github.com/Neoxelox/gilk/workflows/Integration/badge.svg) ![Publication](https://github.com/Neoxelox/gilk/workflows/Publication/badge.svg)
+# gilk ![Integration](https://github.com/Neoxelox/gilk/workflows/Integration/badge.svg) ![Publication](https://github.com/Neoxelox/gilk/workflows/Publication/badge.svg) [![Go Reference](https://pkg.go.dev/badge/github.com/neoxelox/gilk.svg)](https://pkg.go.dev/github.com/neoxelox/gilk)
 **`silk-like query profiler for golang` 🐻**
 
 ![Banner](./static/images/banner.png "Banner")
@@ -31,9 +31,9 @@ func main() {
 
 func someHandler(w http.ResponseWriter, r *http.Request) {
     ctx, endContext := gilk.NewContext(r.Context(), r.URL.Path, r.Method)
-	defer endContext()
+    defer endContext()
 
-	r = r.WithContext(ctx)
+    r = r.WithContext(ctx)
     // ...
     repo.SomeQuery(ctx, something)
     // ...
@@ -51,7 +51,7 @@ func (r *repo) SomeQuery(ctx context.Context, something string) {
 
 func (db *Database) MyQuery(ctx context.Context, query string, args ...interface{}) {
     ctx, endQuery := gilk.NewQuery(ctx, query, args...)
-	defer endQuery()
+    defer endQuery()
 
     db.Query(query, args...)
     // ...
